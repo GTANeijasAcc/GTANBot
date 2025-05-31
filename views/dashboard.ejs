@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTA Neijas Bot Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1><i class="fas fa-gamepad"></i> GTA Neijas Bot Dashboard</h1>
+            <div class="bot-status">
+                <span class="status-indicator <%= botStats.status === 'Online' ? 'online' : 'offline' %>"></span>
+                <%= botStats.status %>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard-grid">
+            <!-- Bot Statistics -->
+            <div class="card stats-card">
+                <h2><i class="fas fa-chart-bar"></i> Bot Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value"><%= botStats.guilds %></div>
+                        <div class="stat-label">Servers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value"><%= botStats.users %></div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value"><%= botStats.channels %></div>
+                        <div class="stat-label">Channels</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value"><%= botStats.commands %></div>
+                        <div class="stat-label">Commands</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value"><%= botStats.ping %>ms</div>
+                        <div class="stat-label">Ping</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value"><%= Math.floor(botStats.uptime / 1000 / 60) %>m</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rich Presence Control -->
+            <div class="card presence-card">
+                <h2><i class="fas fa-tv"></i> Rich Presence Control</h2>
+                <div class="presence-info">
+                    <div class="game-info">
+                        <h3><%= presenceInfo.gameName %></h3>
+                        <p><%= presenceInfo.details %></p>
+                        <p class="current-state">Current: <%= presenceInfo.currentState %></p>
+                    </div>
+                    
+                    <div class="state-controls">
+                        <h4>Set Activity State:</h4>
+                        <div class="state-buttons">
+                            <button onclick="setPresenceState(0)" class="state-btn <%= presenceInfo.stateIndex === 0 ? 'active' : '' %>">
+                                Walking in Downtown Crockton
+                            </button>
+                            <button onclick="setPresenceState(1)" class="state-btn <%= presenceInfo.stateIndex === 1 ? 'active' : '' %>">
+                                Driving an Infernus through Bottomtown San Concepcion
+                            </button>
+                            <button onclick="setPresenceState(2)" class="state-btn <%= presenceInfo.stateIndex === 2 ? 'active' : '' %>">
+                                Walking in Bartine University
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servers List -->
+            <div class="card servers-card">
+                <h2><i class="fas fa-server"></i> Connected Servers</h2>
+                <div class="servers-list">
+                    <% if (guilds.length === 0) { %>
+                        <p class="no-servers">Bot is not connected to any servers yet.</p>
+                    <% } else { %>
+                        <% guilds.forEach(guild => { %>
+                            <div class="server-item">
+                                <div class="server-icon">
+                                    <% if (guild.iconURL()) { %>
+                                        <img src="<%= guild.iconURL() %>" alt="<%= guild.name %>">
+                                    <% } else { %>
+                                        <div class="default-icon"><%= guild.name.charAt(0) %></div>
+                                    <% } %>
+                                </div>
+                                <div class="server-info">
+                                    <h4><%= guild.name %></h4>
+                                    <p><%= guild.memberCount %> members</p>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Commands List -->
+            <div class="card commands-card">
+                <h2><i class="fas fa-terminal"></i> Bot Commands</h2>
+                <div class="commands-header">
+                    <button onclick="showCreateCommandModal()" class="create-command-btn">
+                        <i class="fas fa-plus"></i> Create New Command
+                    </button>
+                </div>
+                <div class="commands-list" id="commandsList">
+                    <div class="command-item core-command">
+                        <div class="command-info">
+                            <strong>/help [command]</strong> - Display all available commands
+                        </div>
+                        <span class="command-type">Core</span>
+                    </div>
+                    <div class="command-item core-command">
+                        <div class="command-info">
+                            <strong>/kick user [reason]</strong> - Kick a member from the server
+                        </div>
+                        <span class="command-type">Core</span>
+                    </div>
+                    <div class="command-item core-command">
+                        <div class="command-info">
+                            <strong>/ban user [reason]</strong> - Ban a member from the server
+                        </div>
+                        <span class="command-type">Core</span>
+                    </div>
+                    <div class="command-item core-command">
+                        <div class="command-info">
+                            <strong>/mute user [duration] [reason]</strong> - Mute a member in the server
+                        </div>
+                        <span class="command-type">Core</span>
+                    </div>
+                    <div class="command-item core-command">
+                        <div class="command-info">
+                            <strong>/warn user [reason]</strong> - Warn a member
+                        </div>
+                        <span class="command-type">Core</span>
+                    </div>
+                    <div class="command-item core-command">
+                        <div class="command-info">
+                            <strong>/sendimage channel [message]</strong> - Send image to specific channel
+                        </div>
+                        <span class="command-type">Core</span>
+                    </div>
+                    <div class="command-item core-command">
+                        <div class="command-info">
+                            <strong>/imagechannel [message]</strong> - Send image with channel selector
+                        </div>
+                        <span class="command-type">Core</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Command Modal -->
+    <div id="createCommandModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Create New Command</h3>
+                <span class="close" onclick="hideCreateCommandModal()">&times;</span>
+            </div>
+            <form id="createCommandForm">
+                <div class="form-group">
+                    <label for="commandName">Command Name *</label>
+                    <input type="text" id="commandName" name="name" placeholder="e.g., ping" required>
+                    <small>Command will be used as !commandname</small>
+                </div>
+                <div class="form-group">
+                    <label for="commandDescription">Description *</label>
+                    <input type="text" id="commandDescription" name="description" placeholder="Brief description of what the command does" required>
+                </div>
+                <div class="form-group">
+                    <label for="commandUsage">Usage (Optional)</label>
+                    <input type="text" id="commandUsage" name="usage" placeholder="e.g., !ping [user]">
+                    <small>Leave empty to auto-generate</small>
+                </div>
+                <div class="form-group">
+                    <label for="commandResponse">Response *</label>
+                    <textarea id="commandResponse" name="response" placeholder="What the bot should reply when this command is used" required rows="4"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="hideCreateCommandModal()" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">Create Command</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
